@@ -67,16 +67,46 @@ spec:
           - containerPort: 8020
             name: fs
           volumeMounts:
+          {{- if .Values.persistence.hostPath }}  
             - name: hdfs-name
               mountPath: /hadoop/dfs/name
+          {{- else }}
+            - name: metadatadir
+              mountPath: /hadoop/dfs/name
+              subPath: name
+          {{- end }}    
             - name: hdfs-config
               mountPath: /etc/hadoop-custom-conf
               readOnly: true
       restartPolicy: Always
       volumes:
-        - name: hdfs-name
+        {{- if .Values.persistence.hostPath }}            
+        - name: hdfs-name        
           hostPath:
-            path: {{ .Values.nameNodeHostPath }}
+            path: {{ .Values.persistence.hostPath }}        
+        {{- end }}
         - name: hdfs-config
           configMap:
             name: {{ template "hdfs-k8s.config.fullname" . }}
+  {{- if not .Values.persistence.hostPath }}
+  volumeClaimTemplates:
+    - metadata:
+        name: metadatadir
+      spec:
+        accessModes:
+          - {{ .Values.persistence.accessMode | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.persistence.size | quote }}
+      {{- if .Values.persistence.storageClass }}
+        {{- if (eq "-" .Values.persistence.storageClass) }}
+        storageClassName: ""
+        {{- else }}
+        storageClassName: "{{ .Values.persistence.storageClass }}"
+        {{- end }}
+      {{- end }}
+      {{- if .Values.persistence.selector }}
+        selector:
+{{ toYaml .Values.persistence.selector | indent 10 }}
+      {{- end }}
+  {{- end }}
