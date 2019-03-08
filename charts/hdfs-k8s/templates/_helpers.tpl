@@ -31,7 +31,7 @@ Create chart name and version as used by the subchart label.
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "zookeeper-fullname" -}}
+{{- define "zookeeper.fullname" -}}
 {{- $fullname := include "hdfs-k8s.fullname" . -}}
 {{- if contains "zookeeper" $fullname -}}
 {{- printf "%s" $fullname -}}
@@ -175,7 +175,7 @@ since that is the only special index that helm template gives us.
 {{- if .Values.global.zookeeperQuorumOverride -}}
 {{- .Values.global.zookeeperQuorumOverride -}}
 {{- else -}}
-{{- $service := include "zookeeper-fullname" . -}}
+{{- $service := include "zookeeper.fullname" . -}}
 {{- $domain := include "svc-domain" . -}}
 {{- $replicas := .Values.global.zookeeperQuorumSize | int -}}
 {{- range $i, $e := until $replicas -}}
