@@ -13,9 +13,9 @@ metadata:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
   ports:
-  - port: 8485
+  - port: {{ .Values.global.journalnodePort }}
     name: jn
-  - port: 8480
+  - port: {{ .Values.httpPort }}
     name: http
   clusterIP: None
   selector:
@@ -87,16 +87,16 @@ spec:
       {{- end }}
       containers:
         - name: hdfs-journalnode
-          image: uhopper/hadoop-namenode:2.7.2
+          image: crs4/namenode:{{ .Values.global.hadoopVersion }}-ubuntu
           env:
             - name: HADOOP_CUSTOM_CONF_DIR
               value: /etc/hadoop-custom-conf
           command: ["/entrypoint.sh"]
-          args: ["/opt/hadoop-2.7.2/bin/hdfs", "--config", "/etc/hadoop", "journalnode"]
+          args: ["hdfs", "journalnode"]
           ports:
-          - containerPort: 8485
+          - containerPort: {{ .Values.global.journalnodePort }}
             name: jn
-          - containerPort: 8480
+          - containerPort: {{ .Values.httpPort }}
             name: http
           volumeMounts:
             # Mount a subpath of the volume so that the journal subdir would be

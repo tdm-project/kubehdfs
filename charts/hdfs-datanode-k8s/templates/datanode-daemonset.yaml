@@ -23,7 +23,7 @@ data:
     set -o xtrace
 
     # Check if datanode registered with the namenode and got non-null cluster ID.
-    _PORTS="50075 1006"
+    _PORTS="{{ .Values.httpPort }} {{ .Values.global.dataNodeSecureHttpPort }}"
     _URL_PATH="jmx?qry=Hadoop:service=DataNode,name=DataNodeInfo"
     _CLUSTER_ID=""
     for _PORT in $_PORTS; do
@@ -78,12 +78,10 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: datanode
-          image: uhopper/hadoop-datanode:2.7.2
+          image: crs4/datanode:{{ .Values.global.hadoopVersion }}-ubuntu
           env:
             - name: HADOOP_CUSTOM_CONF_DIR
               value: /etc/hadoop-custom-conf
-            - name: MULTIHOMED_NETWORK
-              value: "0"
             {{- if and .Values.global.kerberosEnabled .Values.global.jsvcEnabled }}
             - name: HADOOP_SECURE_DN_USER
               value: root

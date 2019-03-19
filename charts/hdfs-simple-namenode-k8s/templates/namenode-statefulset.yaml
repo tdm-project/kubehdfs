@@ -9,7 +9,7 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   ports:
-  - port: 8020
+  - port: {{ .Values.global.nameNodeFsPort }}
     name: fs
   clusterIP: None
   selector:
@@ -57,14 +57,12 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
         - name: hdfs-namenode
-          image: uhopper/hadoop-namenode:2.7.2
+          image: crs4/namenode:{{ .Values.global.hadoopVersion }}-ubuntu
           env:
             - name: HADOOP_CUSTOM_CONF_DIR
               value: /etc/hadoop-custom-conf
-            - name: CLUSTER_NAME
-              value: hdfs-k8s
           ports:
-          - containerPort: 8020
+          - containerPort: {{ .Values.global.nameNodeFsPort }}
             name: fs
           volumeMounts:
           {{- if .Values.persistence.hostPath }}  

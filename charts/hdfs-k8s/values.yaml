@@ -31,6 +31,10 @@ hdfs-config-k8s:
 ## hdfs-journalnode-k8s:
 ## ------------------------------------------------------------------------------
 hdfs-journalnode-k8s:
+
+  ## Journalnode http port
+  httpPort: 8480
+
   persistence:
     ## Persistent Volume Storage Class
     ## If defined, storageClassName: <storageClass>
@@ -57,6 +61,7 @@ hdfs-journalnode-k8s:
 ## hdfs-namenode-k8s:
 ## ------------------------------------------------------------------------------
 hdfs-namenode-k8s:
+
   ## Name of the namenode start script in the config map.
   namenodeStartScript: format-and-run.sh
 
@@ -147,6 +152,10 @@ hdfs-simple-namenode-k8s:
 ## hdfs-datanode-k8s:
 ## ------------------------------------------------------------------------------
 hdfs-datanode-k8s:
+
+  ## Datanode web UI port. Default: 9864 for Hadoop 3, 50075 for Hadoop 2.
+  httpPort: 9864
+
   ## Node labels and tolerations for pod assignment
   nodeSelector: {}
   tolerations: []
@@ -198,12 +207,28 @@ hdfs-krb5-k8s:
 ## Global values affecting all sub-charts:
 ## ------------------------------------------------------------------------------
 global:
+
+  # Hadoop version (must be available from crs4/hadoop)
+  hadoopVersion: 3.2.0
+
   ## A list of the local disk directories on cluster nodes that will contain the datanode
   ## blocks. These paths will be mounted to the datanode as K8s HostPath volumes.
   ## In a command line, the list should be enclosed in '{' and '}'.
   ## e.g. --set "dataNodeHostPath={/hdfs-data,/hdfs-data1}"
   dataNodeHostPath:
     - /hdfs-data
+
+  ## Secure Datanode web UI port.
+  dataNodeSecureHttpPort: 1006
+
+  ## Secure Datanode port.
+  dataNodeSecurePort: 1004
+
+  ## HDFS connection port. Explicitly defined in fs.defaultFS
+  nameNodeFsPort: 9000
+
+  ## Namenode web UI port. Default: 9870 for Hadoop 3, 50070 for Hadoop 2.
+  nameNodeHttpPort: 9870
 
   ## Parameters for determining which Unix user and group IDs to use in pods.
   ## Persistent volume permission may need to match these.
@@ -229,6 +254,9 @@ global:
   ## How many journal nodes to launch as a quorum. Used only when
   ## namenodeHAEnabled is set.
   journalnodeQuorumSize: 3
+
+  ## Journalnode port
+  journalnodePort: 8485
 
   ## Whether or not to enable default affinity setting.
   defaultAffinityEnabled: true

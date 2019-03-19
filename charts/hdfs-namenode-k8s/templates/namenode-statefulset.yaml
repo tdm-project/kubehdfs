@@ -13,9 +13,9 @@ metadata:
     service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
 spec:
   ports:
-  - port: 8020
+  - port: {{ .Values.global.nameNodeFsPort }}
     name: fs
-  - port: 50070
+  - port: {{ .Values.global.nameNodeHttpPort }}
     name: http
   clusterIP: None
   selector:
@@ -75,30 +75,29 @@ data:
     # Turn on traces, useful while debugging.
     set -o xtrace
 
-    _HDFS_BIN=$HADOOP_PREFIX/bin/hdfs
     _METADATA_DIR=/hadoop/dfs/name/current
     if [[ "$MY_POD" = "$NAMENODE_POD_0" ]]; then
       if [[ ! -d $_METADATA_DIR ]]; then
-          $_HDFS_BIN --config $HADOOP_CONF_DIR namenode -format  \
+          hdfs namenode -format  \
               -nonInteractive hdfs-k8s ||
               (rm -rf $_METADATA_DIR; exit 1)
       fi
       _ZKFC_FORMATTED=/hadoop/dfs/name/current/.hdfs-k8s-zkfc-formatted
       if [[ ! -f $_ZKFC_FORMATTED ]]; then
-        _OUT=$($_HDFS_BIN --config $HADOOP_CONF_DIR zkfc -formatZK -nonInteractive 2>&1)
+        _OUT=$(hdfs zkfc -formatZK -nonInteractive 2>&1)
         # zkfc masks fatal exceptions and returns exit code 0
         (echo $_OUT | grep -q "FATAL") && exit 1
         touch $_ZKFC_FORMATTED
       fi
     elif [[ "$MY_POD" = "$NAMENODE_POD_1" ]]; then
       if [[ ! -d $_METADATA_DIR ]]; then
-        $_HDFS_BIN --config $HADOOP_CONF_DIR namenode -bootstrapStandby  \
+        hdfs namenode -bootstrapStandby  \
             -nonInteractive ||  \
             (rm -rf $_METADATA_DIR; exit 1)
       fi
     fi
-    $HADOOP_PREFIX/sbin/hadoop-daemon.sh --config $HADOOP_CONF_DIR start zkfc
-    $_HDFS_BIN --config $HADOOP_CONF_DIR namenode
+    hadoop-daemon.sh start zkfc
+    hdfs namenode
 
   # A start script that will just hang indefinitely. A user can then get
   # inside the pod and debug. Or a user can conduct a custom manual operations.
@@ -171,14 +170,11 @@ spec:
 {{ toYaml .Values.tolerations | indent 8 }}
       {{- end }}
       containers:
-        # TODO: Support hadoop version as option.
         - name: hdfs-namenode
-          image: uhopper/hadoop-namenode:2.7.2
+          image: crs4/namenode:{{ .Values.global.hadoopVersion }}-ubuntu
           env:
             - name: HADOOP_CUSTOM_CONF_DIR
               value: /etc/hadoop-custom-conf
-            - name: MULTIHOMED_NETWORK
-              value: "0"
             # Used by the start script below.
             - name: MY_POD
               valueFrom:
@@ -193,9 +189,9 @@ spec:
           args:
             - /entrypoint.sh "/nn-scripts/{{ .Values.namenodeStartScript }}"
           ports:
-          - containerPort: 8020
+          - containerPort: {{ .Values.global.nameNodeFsPort }}
             name: fs
-          - containerPort: 50070
+          - containerPort: {{ .Values.global.nameNodeHttpPort }}
             name: http
           volumeMounts:
             - name: nn-scripts

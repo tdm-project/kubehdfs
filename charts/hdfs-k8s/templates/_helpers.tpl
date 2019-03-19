@@ -217,14 +217,15 @@ item since that is the only special index that helm template gives us.
 {{- $service := include "hdfs-k8s.journalnode.fullname" . -}}
 {{- $domain := include "svc-domain" . -}}
 {{- $replicas := .Values.global.journalnodeQuorumSize | int -}}
+{{- $jnport := .Values.global.journalnodePort | int -}}
 {{- range $i, $e := until $replicas -}}
   {{- if ne $i 0 -}}
-    {{- printf "%s-%d.%s.%s:8485;" $service $i $service $domain -}}
+    {{- printf "%s-%d.%s.%s:%d;" $service $i $service $domain $jnport -}}
   {{- end -}}
 {{- end -}}
 {{- range $i, $e := until $replicas -}}
   {{- if eq $i 0 -}}
-    {{- printf "%s-%d.%s.%s:8485" $service $i $service $domain -}}
+    {{- printf "%s-%d.%s.%s:%d" $service $i $service $domain $jnport -}}
   {{- end -}}
 {{- end -}}
 {{- end -}}

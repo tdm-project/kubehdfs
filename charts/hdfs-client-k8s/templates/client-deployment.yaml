@@ -25,12 +25,10 @@ spec:
     spec:
       containers:
         - name: hdfs-client
-          image: uhopper/hadoop:2.7.2
+          image: crs4/hadoopclient:{{ .Values.global.hadoopVersion }}-ubuntu
           env:
             - name: HADOOP_CUSTOM_CONF_DIR
               value: /etc/hadoop-custom-conf
-            - name: MULTIHOMED_NETWORK
-              value: "0"
           command: ['/bin/sh', '-c']
           args:
             - /entrypoint.sh /usr/bin/tail -f /var/log/dmesg
