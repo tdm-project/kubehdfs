@@ -1,3 +1,7 @@
+hdfs-client-k8s:
+  image:
+    pullPolicy: IfNotPresent
+
 ## ------------------------------------------------------------------------------
 ## zookeeper:
 ## ------------------------------------------------------------------------------
@@ -32,6 +36,9 @@ hdfs-config-k8s:
 ## ------------------------------------------------------------------------------
 hdfs-journalnode-k8s:
 
+  image:
+    pullPolicy: IfNotPresent
+
   ## Journalnode http port
   httpPort: 8480
 
@@ -61,6 +68,9 @@ hdfs-journalnode-k8s:
 ## hdfs-namenode-k8s:
 ## ------------------------------------------------------------------------------
 hdfs-namenode-k8s:
+
+  image:
+    pullPolicy: IfNotPresent
 
   ## Name of the namenode start script in the config map.
   namenodeStartScript: format-and-run.sh
@@ -110,7 +120,10 @@ hdfs-namenode-k8s:
 ## hdfs-simple-namenode-k8s:
 ## ------------------------------------------------------------------------------
 hdfs-simple-namenode-k8s:
-  
+
+  image:
+    pullPolicy: IfNotPresent
+
   persistence:    
     ## Namenode data can be stored on a Persistent Volume (as default) or 
     ## on a directory of a cluster node as a k8s HostPath volume.
@@ -152,6 +165,9 @@ hdfs-simple-namenode-k8s:
 ## hdfs-datanode-k8s:
 ## ------------------------------------------------------------------------------
 hdfs-datanode-k8s:
+
+  image:
+    pullPolicy: IfNotPresent
 
   ## Datanode web UI port. Default: 9864 for Hadoop 3, 50075 for Hadoop 2.
   httpPort: 9864

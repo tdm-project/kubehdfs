@@ -26,6 +26,7 @@ spec:
       containers:
         - name: hdfs-client
           image: crs4/hadoopclient:{{ .Values.global.hadoopVersion }}-ubuntu
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: HADOOP_CUSTOM_CONF_DIR
               value: /etc/hadoop-custom-conf

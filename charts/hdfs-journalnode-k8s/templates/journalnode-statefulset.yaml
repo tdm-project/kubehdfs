@@ -88,6 +88,7 @@ spec:
       containers:
         - name: hdfs-journalnode
           image: crs4/namenode:{{ .Values.global.hadoopVersion }}-ubuntu
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: HADOOP_CUSTOM_CONF_DIR
               value: /etc/hadoop-custom-conf
