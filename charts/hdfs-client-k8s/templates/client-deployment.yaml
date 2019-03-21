@@ -32,7 +32,7 @@ spec:
               value: /etc/hadoop-custom-conf
           command: ['/bin/sh', '-c']
           args:
-            - /entrypoint.sh /usr/bin/tail -f /var/log/dmesg
+            - /entrypoint.sh /usr/bin/tail -f /dev/null
           volumeMounts:
             - name: hdfs-config
               mountPath: /etc/hadoop-custom-conf

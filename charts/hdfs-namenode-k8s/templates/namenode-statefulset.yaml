@@ -103,7 +103,7 @@ data:
   # inside the pod and debug. Or a user can conduct a custom manual operations.
   do-nothing.sh: |
     #!/usr/bin/env bash
-    tail -f /var/log/dmesg
+    tail -f /dev/null
 
   # A start script that has user specified content. Can be used to conduct
   # ad-hoc operation as specified by a user.
