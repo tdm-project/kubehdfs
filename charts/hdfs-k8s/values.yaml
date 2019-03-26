@@ -240,8 +240,8 @@ global:
   ## Secure Datanode port.
   dataNodeSecurePort: 1004
 
-  ## HDFS connection port. Explicitly defined in fs.defaultFS
-  nameNodeFsPort: 9000
+  ## NameNode RPC port. See https://issues.apache.org/jira/browse/HDFS-12990
+  nameNodePort: 8020
 
   ## Namenode web UI port. Default: 9870 for Hadoop 3, 50070 for Hadoop 2.
   nameNodeHttpPort: 9870

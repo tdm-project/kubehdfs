@@ -20,3 +20,6 @@ global:
   defaultAffinityEnabled: false
   dataNodeHostPath:
     - /mnt/sda1/hdfs-data
+
+  # This is expected in the Kerberos test case
+  nameNodePort: 8020

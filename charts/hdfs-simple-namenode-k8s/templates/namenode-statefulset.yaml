@@ -9,7 +9,7 @@ metadata:
     release: {{ .Release.Name }}
 spec:
   ports:
-  - port: {{ .Values.global.nameNodeFsPort }}
+  - port: {{ .Values.global.nameNodePort }}
     name: fs
   clusterIP: None
   selector:
@@ -63,7 +63,7 @@ spec:
             - name: HADOOP_CUSTOM_CONF_DIR
               value: /etc/hadoop-custom-conf
           ports:
-          - containerPort: {{ .Values.global.nameNodeFsPort }}
+          - containerPort: {{ .Values.global.nameNodePort }}
             name: fs
           volumeMounts:
           {{- if .Values.persistence.hostPath }}  

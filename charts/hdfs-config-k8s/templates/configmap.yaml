@@ -59,7 +59,7 @@ data:
     {{- else }}
       <property>
         <name>fs.defaultFS</name>
-        <value>hdfs://{{ template "namenode-svc-0" . }}:{{ .Values.global.nameNodeFsPort }}</value>
+        <value>hdfs://{{ template "namenode-svc-0" . }}:{{ .Values.global.nameNodePort }}</value>
       </property>
     {{- end }}
     </configuration>
@@ -147,11 +147,11 @@ data:
       </property>
       <property>
         <name>dfs.namenode.rpc-address.hdfs-k8s.nn0</name>
-        <value>{{ template "namenode-svc-0" . }}:{{ .Values.global.nameNodeFsPort }}</value>
+        <value>{{ template "namenode-svc-0" . }}:{{ .Values.global.nameNodePort }}</value>
       </property>
       <property>
         <name>dfs.namenode.rpc-address.hdfs-k8s.nn1</name>
-        <value>{{ template "namenode-svc-1" . }}:{{ .Values.global.nameNodeFsPort }}</value>
+        <value>{{ template "namenode-svc-1" . }}:{{ .Values.global.nameNodePort }}</value>
       </property>
       <property>
         <name>dfs.namenode.http-address.hdfs-k8s.nn0</name>
