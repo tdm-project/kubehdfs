@@ -35,7 +35,7 @@ function _helm_diff_and_install () {
   local gold=$1
   shift
   echo Running: helm install --dry-run --debug "$@"
-  local tmpfile=$(mktemp ${_TEST_DIR}/tmp/helm-dry-run.XXXXXX)
+  local tmpfile=$(mktemp -t helm-dry-run.XXXXXX)
   (helm install --dry-run --debug "$@" |  \
       grep -v -e "^RELEASED" -e "^\[debug\]") > $tmpfile
   if [[ "${BLESS_DIFF:-}" = "true" ]]; then
