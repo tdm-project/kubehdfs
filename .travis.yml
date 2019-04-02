@@ -1,3 +1,5 @@
+# xenial has nsenter, needed to run minikube with the "none" driver
+dist: xenial
 language: bash
 sudo: required
 

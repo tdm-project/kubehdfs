@@ -68,30 +68,8 @@ export PATH="${_MY_DIR}/bin:$PATH"
 if [[ "${USE_MINIKUBE_DRIVER_NONE:-}" = "true" ]]; then
   # Run minikube with none driver.
   # See https://blog.travis-ci.com/2017-10-26-running-kubernetes-on-travis-ci-with-minikube
+  echo nsenter: $(command -v nsenter)
   _VM_DRIVER="--vm-driver=none"
-  if [[ ! -x /usr/local/bin/nsenter ]]; then
-    # From https://engineering.bitnami.com/articles/implementing-kubernetes-integration-tests-in-travis.html
-    # Travis ubuntu trusty env doesn't have nsenter, needed for --vm-driver=none
-    which nsenter >/dev/null && return 0
-    echo "INFO: Building 'nsenter' ..."
-cat <<-EOF | docker run -i --rm -v "$(pwd):/build" ubuntu:14.04 >& nsenter.build.log
-        apt-get update
-        apt-get install -qy git bison build-essential autopoint libtool automake autoconf gettext pkg-config
-        git clone --depth 1 git://git.kernel.org/pub/scm/utils/util-linux/util-linux.git /tmp/util-linux
-        cd /tmp/util-linux
-        ./autogen.sh
-        ./configure --without-python --disable-all-programs --enable-nsenter
-        make nsenter
-        cp -pfv nsenter /build
-EOF
-    if [ ! -f ./nsenter ]; then
-        echo "ERROR: nsenter build failed, log:"
-        cat nsenter.build.log
-        return 1
-    fi
-    echo "INFO: nsenter build OK"
-    sudo mv ./nsenter /usr/local/bin
-  fi
 fi
 
 _MINIKUBE="minikube"
