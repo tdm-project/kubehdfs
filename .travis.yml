@@ -2,6 +2,9 @@
 dist: xenial
 
 addons:
+  apt:
+    packages:
+    - socat
   snaps:
   - name: kubectl
     classic: true
