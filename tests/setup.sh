@@ -16,23 +16,6 @@ fi
 
 _MY_SCRIPT="${BASH_SOURCE[0]}"
 _MY_DIR=$(cd "$(dirname "$_MY_SCRIPT")" && pwd)
-# Avoids 1.7.x because of https://github.com/kubernetes/minikube/issues/2240
-# Also avoids 1.9.4 because of
-# https://github.com/kubernetes/kubernetes/issues/61076#issuecomment-376660233
-# TODO: Try 1.9.x > 1.9.4 when a new minikube version supports that.
-_DEFAULT_K8S_VERSION=v1.10.0
-: "${K8S_VERSION:=$_DEFAULT_K8S_VERSION}"
-_DEFAULT_MINIKUBE_VERSION=v0.26.0
-: "${MINIKUBE_VERSION:=$_DEFAULT_MINIKUBE_VERSION}"
-_HELM_VERSION=v2.8.1
-
-_UNAME_OUT=$(uname -s)
-case "${_UNAME_OUT}" in
-    Linux*)     _MY_OS=linux;;
-    Darwin*)    _MY_OS=darwin;;
-    *)          _MY_OS="UNKNOWN:${unameOut}"
-esac
-echo "Local OS is ${_MY_OS}"
 
 export MINIKUBE_WANTUPDATENOTIFICATION=false
 export MINIKUBE_WANTREPORTERRORPROMPT=false
@@ -44,26 +27,8 @@ source lib/_k8s.sh
 
 rm -rf tmp
 mkdir -p bin tmp
-if [[ ! -x bin/kubectl ]]; then
-  echo Downloading kubectl, which is a requirement for using minikube.
-  curl -Lo bin/kubectl  \
-    https://storage.googleapis.com/kubernetes-release/release/${K8S_VERSION}/bin/${_MY_OS}/amd64/kubectl
-  chmod +x bin/kubectl
-fi
-if [[ ! -x bin/minikube ]]; then
-  echo Downloading minikube.
-  curl -Lo bin/minikube  \
-    https://storage.googleapis.com/minikube/releases/${MINIKUBE_VERSION}/minikube-${_MY_OS}-amd64
-  chmod +x bin/minikube
-fi
-if [[ ! -x bin/helm ]]; then
-  echo Downloading helm
-  curl -Lo tmp/helm.tar.gz  \
-    https://storage.googleapis.com/kubernetes-helm/helm-${_HELM_VERSION}-${_MY_OS}-amd64.tar.gz
-  (cd tmp; tar xfz helm.tar.gz; mv ${_MY_OS}-amd64/helm ${_MY_DIR}/bin)
-fi
-
-export PATH="${_MY_DIR}/bin:$PATH"
+echo Installing minikube
+sudo bash -c 'curl -Lo /usr/local/bin/minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 && chmod +x /usr/local/bin/minikube'
 
 if [[ "${USE_MINIKUBE_DRIVER_NONE:-}" = "true" ]]; then
   # Run minikube with none driver.
@@ -74,14 +39,10 @@ fi
 
 _MINIKUBE="minikube"
 if [[ "${USE_SUDO_MINIKUBE:-}" = "true" ]]; then
-  _MINIKUBE="sudo PATH=$PATH bin/minikube"
+  _MINIKUBE="sudo minikube"
 fi
 
-# The default bootstrapper kubeadm assumes CentOS. Travis is Debian.
-$_MINIKUBE config set bootstrapper localkube
-$_MINIKUBE config set ShowBootstrapperDeprecationNotification false || true
-$_MINIKUBE start --kubernetes-version=${K8S_VERSION}  \
-  ${_VM_DRIVER:-}
+$_MINIKUBE start ${_VM_DRIVER:-}
 # Fix the kubectl context, as it's often stale.
 $_MINIKUBE update-context
 echo Minikube disks:
@@ -109,7 +70,7 @@ kubectl get -n kube-system pods
    echo Addon-manager log:;
    kubectl logs -n kube-system $_ADDON;
    exit 1)
-k8s_single_pod_ready -n kube-system -l k8s-app=kube-dns
+k8s_all_pods_ready 2 -n kube-system -l k8s-app=kube-dns
 k8s_single_pod_ready -n kube-system storage-provisioner
 
 helm init

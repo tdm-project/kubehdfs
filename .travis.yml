@@ -1,5 +1,13 @@
 # xenial has nsenter, needed to run minikube with the "none" driver
 dist: xenial
+
+addons:
+  snaps:
+  - name: kubectl
+    classic: true
+  - name: helm
+    classic: true
+
 language: bash
 sudo: required
 
