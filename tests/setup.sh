@@ -42,7 +42,10 @@ if [[ "${USE_SUDO_MINIKUBE:-}" = "true" ]]; then
   _MINIKUBE="sudo minikube"
 fi
 
-$_MINIKUBE start ${_VM_DRIVER:-}
+$_MINIKUBE start \
+  --extra-config=kubeadm.node-name=$(hostname) \
+  --extra-config=kubelet.hostname-override=$(hostname) \
+  ${_VM_DRIVER:-}
 # Fix the kubectl context, as it's often stale.
 $_MINIKUBE update-context
 echo Minikube disks:
