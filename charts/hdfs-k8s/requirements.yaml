@@ -19,7 +19,7 @@ dependencies:
   repository: file://../hdfs-krb5-k8s
   tags:
   - kerberos
-  version: 0.1.0
+  version: 0.2.0
 - condition: condition.subchart.journalnode
   name: hdfs-journalnode-k8s
   repository: file://../hdfs-journalnode-k8s
