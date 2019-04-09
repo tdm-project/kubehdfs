@@ -1,120 +1,35 @@
----
-layout: global
-title: HDFS on Kubernetes Integration Tests
----
-
 # Running the integration tests
 
-Note that the integration test framework is currently being heavily revised and
-is subject to change.
+Tests consist of the following scripts, to be executed in order:
 
-The integration tests consists of 4 scripts under the `tests` dir:
+  - `setup.sh`: runs initial setup, such as installing and starting Minikube
+  - `run.sh`: launches the charts on Minikube and tests them
+  - `cleanup.sh`: shuts down the HDFS cluster and deletes related k8s resources
+  - `teardown.sh`: stops and deletes the Minikube instance
 
-  - `setup.sh`: Downloads and starts minikube. Also downloads tools such as
-    kubectl, helm, etc.
-  - `run.sh`: Launches the HDFS helm charts on the started minikube instance
-    and tests the resulting HDFS cluster using a HDFS client.
-  - `cleanup.sh`: Shuts down the HDFS cluster so that run.sh can be executed
-    again if necessary.
-  - `teardown.sh`: Stops the minikube instance so that setup.sh can be executed
-    again if necessary.
-
-You can execute these scripts in the listed order to run the integration tests.
-These scripts do not require any command line options for the basic
-functionality. So an example execution would look like:
+The above sequence is meant for running everything from scratch (e.g., on
+Travis). When running tests as part of the development cycle, you probably
+want to avoid re-running the first and last steps, so that you can keep using
+the same Minikube instance. In this case, to get a clean state between
+subsequent tests, you can delete persistent volumes and DataNode
+hostPaths. For instance:
 
 ```
-   $ tests/setup.sh
-   $ tests/run.sh
-   $ tests/cleanup.sh
-   $ tests/teardown.sh
+kubectl delete pvc -l release=my-hdfs
+minikube ssh "sudo bash -c 'rm -rf /mnt/sda1/hdfs-data/*'"
 ```
 
-# Travis CI support
+## Running specific test cases only
 
-The repo uses [Travis CI](https://travis-ci.org/) to run the integration tests.
-See `.travis.yml` under the top directory. Each new pull request will trigger
-a Travis build to test the PR.
-
-You may want to enable Travis in your own fork before sending pull requests.
-You can trigger Travis builds on branches in your fork.
-For details, see https://docs.travis-ci.com/.
-   
-# Advanced usage
-
-## Re-running tests
-
-As a contributor of this project, you may have to re-run the tests after
-modifying some helm chart code. Among the four steps, `setup.sh` takes the most
-time. You may want to avoid that unless it's necessary.
-
-So run `setup.sh` first, followed by `run.sh`:
+`run.sh` will run all tests under `tests/cases`. To run a single test, set the
+`CASES` env var accordingly. For instance:
 
 ```
-   $ tests/setup.sh
-   $ tests/run.sh
+CASES=_basic.sh tests/run.sh
 ```
 
-Then, execute only `cleanup.sh`. i.e. Skip `teardown.sh`. The minikube instance
-will be still up and running.
+`CASES` can also be set for `cleanup.sh`:
 
 ```
-   $ tests/cleanup.sh
-```
-
-Then modify helm charts as you want and execute `run.sh` again.
-
-```
-   $ tests/run.sh
-```
-
-Now repeat the `cleanup` and `run` cycle, while modifying helm charts as you
-want in between.
-
-```
-   $ tests/cleanup.sh
-   ... modify your code ...
-   $ tests/run.sh
-```
-
-Some data are stored in the minikube instance. For example, the downloaded
-docker images and the persistent volume data, In some cases, you may want to
-clean them up. You can run `teardown.sh` and `setup.sh` again to
-purge them.
-
-## Running only particular test cases.
-
-`run.sh` will enumerate all the test cases under `tests/cases` dir. You may
-want to run only a particular test case say `tests/cases/_basic.sh`. You
-can specify to `CASES` env var to cover the test case only:
-
-```
-   $ CASES=_basic.sh tests/run.sh
-```
-
-`CASES` can be also set for `cleanup.sh`.
-
-```
-   $ CASES=_basic.sh tests/cleanup.sh
-```
-
-## Checking the helm chart diff from the dry-run
-
-Before running `helm install` commands, `run.sh` will also conduct dry-run
-and check the expanded K8s resource yaml content from the debug information.
-The repo has gold files checked in, and the expanded yaml content will be
-compared against the gold files.
-
-To ensure your change produces no diff, you can set the `CRASH_ON_DIFF` env
-var.
-
-```
-   $ DRY_RUN_ONLY=true CRASH_ON_DIFF=true tests/run.sh
-```
-
-To promote your yaml output to new golds, you can set the `BLESS_DIFF` env
-var.
-
-```
-   $ DRY_RUN_ONLY=true BLESS_DIFF=true tests/run.sh
+CASES=_basic.sh tests/cleanup.sh
 ```

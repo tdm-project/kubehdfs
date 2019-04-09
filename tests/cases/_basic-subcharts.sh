@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 function run_test_case () {
-  _helm_diff_and_install  \
-    ${_TEST_DIR}/gold/subchart-zookeeper.gold  \
+  helm install  \
     hdfs-k8s  \
     -n my-hdfs-zookeeper  \
     --values ${_TEST_DIR}/values/common.yaml  \
@@ -11,8 +10,7 @@ function run_test_case () {
     --set zookeeper.fullnameOverride=my-hdfs-zookeeper  \
     --set global.fullnameOverride=my-hdfs
 
-  _helm_diff_and_install  \
-    ${_TEST_DIR}/gold/subchart-config.gold  \
+  helm install  \
     hdfs-k8s  \
     -n my-hdfs-config  \
     --values ${_TEST_DIR}/values/common.yaml  \
@@ -20,8 +18,7 @@ function run_test_case () {
     --set condition.subchart.config=true  \
     --set global.fullnameOverride=my-hdfs
 
-  _helm_diff_and_install  \
-    ${_TEST_DIR}/gold/subchart-journalnode.gold  \
+  helm install  \
     hdfs-k8s  \
     -n my-hdfs-journalnode  \
     --values ${_TEST_DIR}/values/common.yaml  \
@@ -29,8 +26,7 @@ function run_test_case () {
     --set condition.subchart.journalnode=true  \
     --set global.fullnameOverride=my-hdfs
 
-  _helm_diff_and_install  \
-    ${_TEST_DIR}/gold/subchart-namenode.gold  \
+  helm install  \
     hdfs-k8s  \
     -n my-hdfs-namenode  \
     --values ${_TEST_DIR}/values/common.yaml  \
@@ -38,8 +34,7 @@ function run_test_case () {
     --set condition.subchart.namenode=true  \
     --set global.fullnameOverride=my-hdfs
 
-  _helm_diff_and_install  \
-    ${_TEST_DIR}/gold/subchart-datanode.gold  \
+  helm install  \
     hdfs-k8s  \
     -n my-hdfs-datanode  \
     --values ${_TEST_DIR}/values/common.yaml  \
@@ -47,18 +42,13 @@ function run_test_case () {
     --set condition.subchart.datanode=true  \
     --set global.fullnameOverride=my-hdfs
 
-  _helm_diff_and_install  \
-    ${_TEST_DIR}/gold/subchart-client.gold  \
+  helm install  \
     hdfs-k8s  \
     -n my-hdfs-client \
     --values ${_TEST_DIR}/values/common.yaml  \
     --set tags.ha=false  \
     --set condition.subchart.client=true  \
     --set global.fullnameOverride=my-hdfs
-
-  if [[ "${DRY_RUN_ONLY:-false}" = "true" ]]; then
-    return
-  fi
 
   k8s_single_pod_ready -l app=zookeeper,release=my-hdfs-zookeeper
   k8s_all_pods_ready 3 -l app=hdfs-journalnode,release=my-hdfs-journalnode
