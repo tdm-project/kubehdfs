@@ -5,7 +5,7 @@ function run_test_case () {
   _NODE=$(kubectl get node --no-headers -o name | cut -d/ -f2)
   kubectl label nodes $_NODE hdfs-namenode-selector=hdfs-namenode-0
 
-  _helm_diff_and_install ${_TEST_DIR}/gold/single-namenode.gold  \
+  helm install  \
     hdfs-k8s  \
     -n my-hdfs  \
     --set tags.ha=false  \
@@ -13,10 +13,6 @@ function run_test_case () {
     --set global.namenodeHAEnabled=false  \
     --set "hdfs-simple-namenode-k8s.nameNodeHostPath=/mnt/sda1/hdfs-name"  \
     --set "global.dataNodeHostPath={/mnt/sda1/hdfs-data}"
-
-  if [[ "${DRY_RUN_ONLY:-false}" = "true" ]]; then
-    return
-  fi
 
   k8s_single_pod_ready -l app=hdfs-namenode,release=my-hdfs
   k8s_single_pod_ready -l app=hdfs-datanode,release=my-hdfs

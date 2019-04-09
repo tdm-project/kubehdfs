@@ -1,16 +1,12 @@
 #!/usr/bin/env bash
 
 function run_test_case () {
-  _helm_diff_and_install ${_TEST_DIR}/gold/basic.gold  \
+  helm install  \
     hdfs-k8s  \
     -n my-hdfs  \
     --values ${_TEST_DIR}/values/common.yaml  \
     --values ${_TEST_DIR}/values/custom-hadoop-config.yaml  \
     --set "global.dataNodeHostPath={/mnt/sda1/hdfs-data0,/mnt/sda1/hdfs-data1}"
-
-  if [[ "${DRY_RUN_ONLY:-false}" = "true" ]]; then
-    return
-  fi
 
   k8s_single_pod_ready -l app=zookeeper,release=my-hdfs
   k8s_all_pods_ready 3 -l app=hdfs-journalnode,release=my-hdfs
