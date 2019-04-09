@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
 function run_test_case () {
-
-  _NODE=$(kubectl get node --no-headers -o name | cut -d/ -f2)
-  kubectl label nodes $_NODE hdfs-namenode-selector=hdfs-namenode-0
-
   helm install  \
     hdfs-k8s  \
     -n my-hdfs  \
@@ -35,7 +31,4 @@ function run_test_case () {
 
 function cleanup_test_case() {
   helm delete --purge my-hdfs || true
-
-  _NODE=$(kubectl get node --no-headers -o name | cut -d/ -f2) || true
-  kubectl label nodes $_NODE hdfs-namenode-selector- || true
 }
