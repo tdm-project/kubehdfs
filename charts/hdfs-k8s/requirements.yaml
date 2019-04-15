@@ -13,33 +13,33 @@ dependencies:
   - ha
   - kerberos
   - simple
-  version: 0.2.0
+  version: 0.2.1
 - condition: condition.subchart.kerberos
   name: hdfs-krb5-k8s
   repository: file://../hdfs-krb5-k8s
   tags:
   - kerberos
-  version: 0.2.0
+  version: 0.2.1
 - condition: condition.subchart.journalnode
   name: hdfs-journalnode-k8s
   repository: file://../hdfs-journalnode-k8s
   tags:
   - ha
   - kerberos
-  version: 0.2.0
+  version: 0.2.1
 - condition: condition.subchart.namenode
   name: hdfs-namenode-k8s
   repository: file://../hdfs-namenode-k8s
   tags:
   - ha
   - kerberos
-  version: 0.2.0
+  version: 0.2.1
 - condition: condition.subchart.simple-namenode
   name: hdfs-simple-namenode-k8s
   repository: file://../hdfs-simple-namenode-k8s
   tags:
   - simple
-  version: 0.2.0
+  version: 0.2.1
 - condition: condition.subchart.datanode
   name: hdfs-datanode-k8s
   repository: file://../hdfs-datanode-k8s
@@ -47,7 +47,7 @@ dependencies:
   - ha
   - kerberos
   - simple
-  version: 0.2.0
+  version: 0.2.1
 - condition: condition.subchart.client
   name: hdfs-client-k8s
   repository: file://../hdfs-client-k8s
@@ -55,4 +55,4 @@ dependencies:
   - ha
   - kerberos
   - simple
-  version: 0.2.0
+  version: 0.2.1
