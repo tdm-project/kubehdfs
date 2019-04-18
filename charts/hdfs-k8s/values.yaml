@@ -318,3 +318,9 @@ tags:
 
   ## Trigger all subcharts required for non-HA setup. Disabled by default.
   simple: false
+
+#init_fs allows to create dirs as hdfs is ready
+#accepts a list o dictionaries with the following keys:
+#'dir', 'owner', 'group', 'permissions' (as string, optional)
+init_fs:
+
