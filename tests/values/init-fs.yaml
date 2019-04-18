@@ -1,0 +1,9 @@
+init_fs:
+  - dir: /tmp
+    owner: root
+    group: root
+    permissions: "777"
+  - dir: /user/foo
+    owner: foo
+    group: foo
+
