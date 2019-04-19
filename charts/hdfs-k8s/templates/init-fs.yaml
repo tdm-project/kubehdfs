@@ -27,7 +27,7 @@ spec:
           image: crs4/hadoopclient:{{ .Values.global.hadoopVersion }}-ubuntu
           imagePullPolicy: IfNotPresent
           env:
-            - name: HADOOP_CONF_DIR
+            - name: HADOOP_CUSTOM_CONF_DIR
               value: /etc/hadoop-custom-conf
 
           {{- $args := ""}}
