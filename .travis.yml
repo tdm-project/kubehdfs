@@ -19,6 +19,7 @@ env:
   - CASES=_basic-subcharts.sh
   - CASES=_kerberos.sh
   - CASES=_single-namenode.sh
+  - CASES=_init-fs.sh
 
 before_script:
 # Required for K8s v1.10.x. See
