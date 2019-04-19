@@ -1,0 +1,22 @@
+{{- if .Values.init_fs }}
+apiVersion: v1
+data:
+  create_tree.sh: |
+    #!/bin/bash
+    set -euxo pipefail
+    echo "args $@"
+    for dir_user_group in $@; do
+      dir=$(echo $dir_user_group |  cut -d ':' -f 1)
+      user=$(echo $dir_user_group | cut -d ':' -f 2)
+      group=$(echo $dir_user_group | cut -d ':' -f 3)
+      permissions=$(echo $dir_user_group | cut -d ':' -f 4)
+      hdfs dfs -mkdir -p $dir
+      hdfs dfs -chown "$user:$group" $dir
+      if [ $permissions ]; then
+        hdfs dfs -chmod $permissions $dir
+      fi
+    done
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-init-fs-configmap
+{{- end }}

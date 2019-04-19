@@ -1,0 +1,67 @@
+{{- if .Values.init_fs }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{.Release.Name}}-init-fs"
+  labels:
+    app.kubernetes.io/managed-by: {{.Release.Service | quote }}
+    app.kubernetes.io/instance: {{.Release.Name | quote }}
+    helm.sh/chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+  annotations:
+    # This is what defines this resource as a hook. Without this line, the
+    # job is considered part of the release.
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: "{{.Release.Name}}-init-fs"
+      labels:
+        app.kubernetes.io/managed-by: {{.Release.Service | quote }}
+        app.kubernetes.io/instance: {{.Release.Name | quote }}
+        helm.sh/chart: "{{.Chart.Name}}-{{.Chart.Version}}"
+    spec:
+      containers:
+        - name: hdfs-init-fs
+          image: crs4/hadoopclient:{{ .Values.global.hadoopVersion }}-ubuntu
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: HADOOP_CUSTOM_CONF_DIR
+              value: /etc/hadoop-custom-conf
+
+          {{- $args := ""}}
+          {{- range .Values.init_fs }}
+            {{- $args = printf "%s %s:%s:%s:%s" $args  .dir .owner .group ( .permissions | default "" ) }}
+          {{- end }}
+          command: ['/bin/sh', '-c']
+          args:
+            - "/entrypoint.sh /post-install/create_tree.sh {{ $args }}"
+          volumeMounts:
+            - name: hdfs-config
+              mountPath: /etc/hadoop-custom-conf
+              readOnly: true
+            - name: hdfs-init-fs
+              mountPath: /post-install
+              readOnly: true
+            {{- if .Values.global.kerberosEnabled }}
+            - name: kerberos-config
+              mountPath: /etc/krb5.conf
+              subPath: {{ .Values.global.kerberosConfigFileName }}
+              readOnly: true
+            {{- end }}
+      restartPolicy: Never
+      volumes:
+        - name: hdfs-config
+          configMap:
+            name: {{ template "hdfs-k8s.config.fullname" . }}
+        - name: hdfs-init-fs
+          configMap:
+            name: {{ .Release.Name }}-init-fs-configmap
+            defaultMode: 0744
+        {{- if .Values.global.kerberosEnabled }}
+        - name: kerberos-config
+          configMap:
+            name: {{ template "krb5-configmap" . }}
+        {{- end }}
+{{- end }}
