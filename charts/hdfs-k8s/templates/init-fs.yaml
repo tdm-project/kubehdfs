@@ -29,11 +29,14 @@ spec:
           env:
             - name: HADOOP_CONF_DIR
               value: /etc/hadoop-custom-conf
-          command: ['/post-install/create_tree.sh']
-          args:
+
+          {{- $args := ""}}
           {{- range .Values.init_fs }}
-            - {{ (printf "%s:%s:%s:%s" .dir .owner .group ( .permissions | default "" )) | quote }}
+            {{- $args = printf "%s %s:%s:%s:%s" $args  .dir .owner .group ( .permissions | default "" ) }}
           {{- end }}
+          command: ['/bin/sh', '-c']
+          args:
+            - "/entrypoint.sh /post-install/create_tree.sh {{ $args }}"
           volumeMounts:
             - name: hdfs-config
               mountPath: /etc/hadoop-custom-conf
