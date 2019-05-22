@@ -204,7 +204,8 @@ spec:
                 - -c
                 - "hdfs haadmin -getAllServiceState | grep active"
             initialDelaySeconds: 60
-            periodSeconds: 600
+            periodSeconds: 200
+            failureThreshold: 2
 
           volumeMounts:
             - name: nn-scripts
