@@ -109,10 +109,6 @@ data:
   # ad-hoc operation as specified by a user.
   custom-run.sh: {{ .Values.customRunScript | quote }}
 
-  check-active.sh: |
-    #!/usr/bin/env bash
-    hdfs haadmin -getAllServiceState | grep active
-
 
 ---
 apiVersion: apps/v1beta1
@@ -204,7 +200,9 @@ spec:
           livenessProbe:
             exec:
               command:
-              - /nn-scripts/check-active.sh
+                - /bin/sh
+                - -c
+                - "hdfs haadmin -getAllServiceState | grep active"
             initialDelaySeconds: 60
             periodSeconds: 600
 
