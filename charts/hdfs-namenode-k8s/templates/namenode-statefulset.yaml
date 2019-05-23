@@ -108,6 +108,8 @@ data:
   # A start script that has user specified content. Can be used to conduct
   # ad-hoc operation as specified by a user.
   custom-run.sh: {{ .Values.customRunScript | quote }}
+
+
 ---
 apiVersion: apps/v1beta1
 kind: StatefulSet
@@ -194,6 +196,17 @@ spec:
             name: fs
           - containerPort: {{ .Values.global.nameNodeHttpPort }}
             name: http
+
+          livenessProbe:
+            exec:
+              command:
+                - /bin/sh
+                - -c
+                - "hdfs haadmin -getAllServiceState | grep active"
+            initialDelaySeconds: 60
+            periodSeconds: 200
+            failureThreshold: 2
+
           volumeMounts:
             - name: nn-scripts
               mountPath: /nn-scripts
