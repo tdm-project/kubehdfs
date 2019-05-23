@@ -1,4 +1,4 @@
 apiVersion: v1
 description: A Helm chart for configuring HDFS on Kubernetes
 name: hdfs-config-k8s
-version: 0.3.0
+version: 0.3.1
