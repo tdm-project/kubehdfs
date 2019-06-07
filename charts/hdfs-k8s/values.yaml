@@ -124,6 +124,9 @@ hdfs-simple-namenode-k8s:
   image:
     pullPolicy: IfNotPresent
 
+  nodePortSvc:
+    enabled: false
+
   persistence:    
     ## Namenode data can be stored on a Persistent Volume (as default) or 
     ## on a directory of a cluster node as a k8s HostPath volume.
@@ -243,8 +246,14 @@ global:
   ## NameNode RPC port. See https://issues.apache.org/jira/browse/HDFS-12990
   nameNodePort: 8020
 
+  ## port for namenode's NodePort service
+  externalNameNodePort: ~
+
   ## Namenode web UI port. Default: 9870 for Hadoop 3, 50070 for Hadoop 2.
   nameNodeHttpPort: 9870
+
+  ## port for namenode's web interface NodePort service
+  externalNameNodeHttpPort: ~
 
   ## Parameters for determining which Unix user and group IDs to use in pods.
   ## Persistent volume permission may need to match these.
