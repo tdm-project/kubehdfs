@@ -275,6 +275,38 @@ JournalNodes:
       --set global.namenodeHAEnabled=false
 ```
 
+### Allowing access from outside the Kubernetes cluster
+
+This is currently only supported with simple (non-HA) configurations.
+
+Set properties in `hdfsSite` to configure data nodes to use ports appropriate
+for your cloud security group/firewall configuration.
+
+```
+    hdfs-config-k8s:
+      customHadoopConfig:
+         hdfsSite:
+           dfs.datanode.ipc.address: "0.0.0.0:32997"
+           dfs.datanode.address: "0.0.0.0:32998"
+           dfs.datanode.http.address: "0.0.0.0:32999"
+```
+
+Configure ports for NodePort services to expose for namenode:
+
+```
+  global:
+    externalNameNodeHttpPort: 30987
+    externalNameNodePort: 30820
+```
+
+Finally, enabled the node port service in the hdfs-simple-namenode-k8s chart:
+
+```
+    hdfs-simple-namenode-k8s:
+      nodePortSvc:
+        enabled: true
+```
+
 # Security
 
 ## K8s secret containing Kerberos keytab files

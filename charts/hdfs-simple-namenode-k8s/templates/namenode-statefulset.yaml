@@ -1,21 +1,3 @@
-# A headless service to create DNS records.
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ template "hdfs-k8s.namenode.fullname" . }}
-  labels:
-    app: {{ template "hdfs-k8s.namenode.name" . }}
-    chart: {{ template "hdfs-k8s.subchart" . }}
-    release: {{ .Release.Name }}
-spec:
-  ports:
-  - port: {{ .Values.global.nameNodePort }}
-    name: fs
-  clusterIP: None
-  selector:
-    app: {{ template "hdfs-k8s.namenode.name" . }}
-    release: {{ .Release.Name }}
----
 apiVersion: apps/v1beta1
 kind: StatefulSet
 metadata:
